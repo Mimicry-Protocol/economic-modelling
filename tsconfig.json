@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2017",
+  },
+  "exclude": [
+    "./tests/",
+    "./node_modules/",
+    "./dist/"
+  ],
+}
