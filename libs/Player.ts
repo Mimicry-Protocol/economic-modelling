@@ -2,10 +2,10 @@ import { Position } from "./Position";
 import * as namer from "random-name";
 
 export enum Budget {
-    low = 10^3,     // 1,000
-    medium = 10^4,  // 10,000
-    high = 10^5,    // 100,000
-    whale = 10^6,   // 1,000,000
+    low = 10**3,     // 1,000
+    medium = 10**4,  // 10,000
+    high = 10**5,    // 100,000
+    whale = 10**6,   // 1,000,000
 }
 
 export class Player {
