@@ -2,7 +2,7 @@
   "name": "economic-modelling",
   "version": "1.0.0",
   "description": "A Monte Carlo experiment to help determine the most optimal economic constants for the Mimicry Protocol.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
   },

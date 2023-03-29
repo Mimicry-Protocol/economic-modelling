@@ -1,5 +1,5 @@
-import { Oracle } from '../libs/Oracle';
 import { expect } from 'chai';
+import { Oracle } from '../libs/Oracle';
 
 describe("Oracles", () => {
     it("should be created with a random reference price", () => {

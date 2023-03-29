@@ -1,10 +1,15 @@
-import { Player } from '../libs/Player';
+import { 
+    Budget,
+    Player 
+} from '../libs/Player';
 import { expect } from 'chai';
 
 describe("Players", () => {   
-    it("should be created with a random name and risk tolerance", () => {
-        const player = new Player();
+    // should have a name and budget
+    it("should have a name and budget", () => {
+        const player = new Player("Test Player", Budget.low);
         expect(player.name).to.be.a("string");
-        expect(player.riskTolerance).to.be.a("number");
+        expect(player.budget).to.equal(Budget.low);
+        expect(player.name).to.equal("Test Player");
     });
 });

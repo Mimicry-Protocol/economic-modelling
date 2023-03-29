@@ -11,6 +11,7 @@ export class Oracle {
 
     constructor() {        
         this.#referencePrice = _.random(oraclePriceMin, oraclePriceMax);
+        // @TODO: Add ability to set the long/short bias within the max shift window. This will also impact volitility.
     }
 
     get referencePrice() {

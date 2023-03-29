@@ -3,13 +3,11 @@ import {
     oracleMaxBullShiftPerPeriod,
     oraclePriceMin,
     oraclePriceMax,
-    minDepositAmount,
-    maxDepositAmount,
     exitFeeTraders,
     exitFeeLPs,
     oddsNewPositionIsLp,
 
-    
+
     timePeriods,
     minNumNewPositionsPerPeriod,
     maxNumNewPositionsPerPeriod,
@@ -38,14 +36,6 @@ describe("Constants", () => {
     it ("should have a valid oraclePriceMax", () => {
         expect(oraclePriceMax).to.be.a("number");
         expect(oraclePriceMax).to.be.greaterThan(0);
-    });
-    it ("should have a valid minDepositAmount", () => {
-        expect(minDepositAmount).to.be.a("number");
-        expect(minDepositAmount).to.be.greaterThan(0);
-    });
-    it ("should have a valid maxDepositAmount", () => {
-        expect(maxDepositAmount).to.be.a("number");
-        expect(maxDepositAmount).to.be.greaterThan(0);
     });
     it ("should have a valid exitFeeTraders", () => {
         expect(exitFeeTraders).to.be.a("number");
