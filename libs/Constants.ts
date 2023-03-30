@@ -9,12 +9,6 @@ export const exitFeeTraders = 0.003;                // 0 to 1, 0 is no fee, 1 is
 export const exitFeeLPs = 0.001;                    // 0 to 1, 0 is no fee, 1 is 100% fee
 export const oddsNewPositionIsLp = 0.1;             // 0 to 1, 0 is no LPs, 1 is all LPs
 
-// Global
-export enum Token {
-    USDC = "USDC",
-    USDT = "USDT",
-    DAI = "DAI",
-}
 
 // Unsorted
 export const timePeriods = 10;

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as namer from "random-name";
-import { Token } from './Constants';
+import { Token } from './Token';
 import { Oracle } from './Oracle';
 import { Direction, Position } from './Position';
 import { Player } from './Player';
@@ -46,7 +46,7 @@ export class Market {
     openPosition(
         player: Player = new Player(),
         direction: Direction = (Math.random() < 0.5) ? Direction.long : Direction.short, 
-        amount: number = (Math.random() * player.budget) + (player.budget / 2), 
+        amount: number = Math.random() * player.budget,
         token: Token = Token.USDC, 
     ):Position {
         const position:Position = new Position(this, player, direction, amount, token);

@@ -13,10 +13,12 @@ export class Director extends Player {
         this.markets = [];
     }
 
+    // This is called from the Market.replaceDirector
     addMarket(market: Market = new Market()) {
         this.markets.push(market);
     }
 
+    // This is called from the Market.replaceDirector
     removeMarket(market: Market) {
         this.markets = this.markets.filter(m => m !== market);
     }
