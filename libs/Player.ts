@@ -1,5 +1,7 @@
 import { Position } from "./Position";
 import * as namer from "random-name";
+// TODO: Upgrade namer to @faker-js/faker
+
 
 export enum Budget {
     low = 10**3,     // 1,000

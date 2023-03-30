@@ -19,6 +19,7 @@ export class Market {
     positions: Position[];
     players: Player[];
     skew: Skew;
+    block: number = 0; // Represents the current block number for tracking time
 
     constructor(
         _name: string = namer.place(),
@@ -90,8 +91,11 @@ export class Market {
         }
         this.skew[payer] -= payment;
         this.skew[payee] += payment;
-    }
 
+        // Increment the blockTime for tracking purposes
+        this.block++;
+    }
+ 
     get referencePrice():number {
         return this.oracle.referencePrice;
     }

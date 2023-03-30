@@ -56,37 +56,47 @@ export class Position {
         } else {
             this.market.increaseShorts(amount);
         }
+
+        this.market.valueTranferEvent(0);
     }
 
     withdraw(amount: number) {
-        const feesToPay = amount * this.exitFee;
+        const feesToPay = amount * this.exitFeeRatio;
         this.feesPaid += feesToPay;
         this.amountWithdrawn += amount - feesToPay;
+
+        this.market.valueTranferEvent(0);
+    }
+
+    get positionValueBeforeFees():number {
+        return this.amountDeposited - this.amountWithdrawn;
     }
 
     get earnsFees():boolean {
-        // if this player has another position in this market, 
-        // with the opposite direction, 
-        // with a liquidation value at least 10% of this liquidation value, 
-        // then return true
-        const otherPositions = this.market.positions.filter(position => position.player === this.player && position.direction !== this.direction);
-        return otherPositions.some(position => position.liquidationValue > this.liquidationValue * 0.1);
+        // Get the total amount long and short that this player has in this market
+        const positions = this.player.positions.filter(position => position.market === this.market);
+        const totalLong = positions.reduce((acc, position) => acc + position.long, 0);
+        const totalShort = positions.reduce((acc, position) => acc + position.short, 0);
+
+        // If each side is within 90% of each other, then return true
+        const percentageDifference = Math.abs(totalLong - totalShort) / Math.max(totalLong, totalShort) * 100;
+        return percentageDifference <= 90;
     }
 
     get long():number {
-        return (this.direction === Direction.long) ? this.liquidationValue : 0;
+        return (this.direction === Direction.long) ? this.positionValueBeforeFees : 0;
     }
 
     get short():number {
-        return (this.direction === Direction.short) ? this.liquidationValue : 0;
+        return (this.direction === Direction.short) ? this.positionValueBeforeFees : 0;
     }
 
-    get exitFee():number {
+    get exitFeeRatio():number {
         return (this.earnsFees) ? exitFeeLPs : exitFeeTraders;
     }
 
     get feesOwed():number {
-        return (this.amountDeposited - this.amountWithdrawn - this.feesPaid) * this.exitFee;
+        return (this.amountDeposited - this.amountWithdrawn - this.feesPaid) * this.exitFeeRatio;
     }
 
     get unrealizedProfit():number {
