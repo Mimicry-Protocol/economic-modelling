@@ -6,7 +6,7 @@ import { Position } from '../libs/Position';
 import { Market } from '../libs/Market';
 import { Player } from '../libs/Player';
 import { Direction } from '../libs/Position';
-import { Token } from '../libs/Constants';
+import { Token } from '../libs/Token';
 import { expect } from 'chai';
 
 describe("Positions", () => {
