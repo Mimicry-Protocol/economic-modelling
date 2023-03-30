@@ -53,10 +53,12 @@ export class Market {
         return position;
     }
 
+    // This is called from the position constructor
     addPosition(position: Position) {
         this.positions.push(position);
     }
 
+    // This is called from the position constructor
     addPlayer(player: Player) {
         if (!_.includes(this.players, player)) {
             this.players.push(player);

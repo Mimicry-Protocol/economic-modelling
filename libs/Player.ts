@@ -23,6 +23,7 @@ export class Player {
       this.positions = [];
     }
 
+    // This is called from the position constructor
     addPosition(position: Position) {
         this.positions.push(position);
     }
