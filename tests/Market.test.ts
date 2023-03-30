@@ -46,10 +46,10 @@ describe("Markets", () => {
         const player = new Player();
         market.openPosition(player, Direction.long, 100);
         market.openPosition(player, Direction.short, 100);
-        market.valueTranferEvent(Direction.long, .1);
+        market.valueTranferEvent(-.1);
         expect(market.skew.long).to.equal(90);
         expect(market.skew.short).to.equal(110);
-        market.valueTranferEvent(Direction.short, .1);
+        market.valueTranferEvent(.1);
         expect(market.skew.long).to.equal(101);
         expect(market.skew.short).to.equal(99);
         market.valueTranferEvent();
@@ -61,9 +61,12 @@ describe("Markets", () => {
         const player = new Player();
         market.openPosition(player, Direction.long, 100);
         market.openPosition(player, Direction.short, 100);
-        market.valueTranferEvent(Direction.short, 1.5);
+        market.valueTranferEvent(1.5);
         expect(market.skew.long).to.equal(200);
         expect(market.skew.short).to.equal(0);
+        market.valueTranferEvent(-1);
+        expect(market.skew.long).to.equal(0);
+        expect(market.skew.short).to.equal(200);
     });
 
 });

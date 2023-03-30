@@ -49,6 +49,7 @@ export class Market {
         amount: number = Math.random() * player.budget,
         token: Token = Token.USDC, 
     ):Position {
+        // TODO: Check to ensure that the player has enough budget to open a position
         const position:Position = new Position(this, player, direction, amount, token);
         return position;
     }
@@ -73,20 +74,22 @@ export class Market {
         this.skew.short += amount;
     }
 
-    // TODO: Figure out why this sometimes allows a market to go negative
     valueTranferEvent(
-        fromSide: Direction = (Math.random() < 0.5) ? Direction.long : Direction.short, 
         percentage: number = (this.referencePrice - this.lastReferencePrice) / this.lastReferencePrice,
     ) {
-        const toSide = (fromSide === Direction.long) ? Direction.short : Direction.long;
-        let skewTransfer = this.skew[fromSide] * percentage;
+        // If the percentage is positive, then the shorts pay the longs
+        // If the percentage is negative, then the longs pay the shorts
+        const payer = (percentage > 0) ? Direction.short : Direction.long;
+        const payee = (percentage > 0) ? Direction.long : Direction.short;
         
-        // make the skew 0 if it goes negative
-        if (this.skew[fromSide] - skewTransfer < 0) {
-            skewTransfer = this.skew[fromSide];
-        }    
-        this.skew[fromSide] -= skewTransfer;
-        this.skew[toSide] += skewTransfer;
+        let payment = Math.abs(this.skew[payer] * percentage);
+        
+        // make the payment equal to all the money that the payer has if the payment goes over the payer's budget
+        if (this.skew[payer] - payment <= 0) {
+            payment = this.skew[payer];
+        }
+        this.skew[payer] -= payment;
+        this.skew[payee] += payment;
     }
 
     get referencePrice():number {
