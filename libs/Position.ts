@@ -95,6 +95,12 @@ export class Position {
         return (this.earnsFees) ? exitFeeLPs : exitFeeTraders;
     }
 
+    
+
+
+
+
+
     get feesOwed():number {
         return (this.amountDeposited - this.amountWithdrawn - this.feesPaid) * this.exitFeeRatio;
     }

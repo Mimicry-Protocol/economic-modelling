@@ -1,5 +1,4 @@
 import { Market } from "./libs/Market";
-import { Direction, Position } from "./libs/Position";
 
 const doodles = new Market("Doodles");
 
