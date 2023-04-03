@@ -6,6 +6,7 @@
   "exclude": [
     "./tests/",
     "./node_modules/",
-    "./dist/"
+    "./dist/",
+    ".parcel-cache"
   ],
 }

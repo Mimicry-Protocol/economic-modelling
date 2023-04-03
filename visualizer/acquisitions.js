@@ -9,6 +9,7 @@ import Chart from 'chart.js/auto'
     { year: 2014, count: 22 },
     { year: 2015, count: 30 },
     { year: 2016, count: 28 },
+    { year: 2017, count: 35 },
   ];
 
   new Chart(

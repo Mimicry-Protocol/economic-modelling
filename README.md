@@ -1,12 +1,12 @@
 # Mimicry Economic Modeling
 A Monte Carlo experiment to help determine the most optimal economic constants for the Mimicry Protocol.
 
+## To Build
+Run **```npm install```** from the root directory.
+
 ## To Test
-Run ```ts-node index.ts``` from the command line.
+Run **```ts-node index.ts```** from the root directory.
 
 ## To Run the Visualizer
-1. Run **```npm run express```** from the Terminal.
-
-2. Run **```npm run dev```** from another Terminal window.
-
-3. Then [navigate here](http://localhost:1234) to view the simulation.
+1. Run **```npm run dev```** from the root directory.
+2. Then [navigate here](http://localhost:1234) to view the simulation.
