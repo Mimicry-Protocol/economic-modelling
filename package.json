@@ -1,0 +1,33 @@
+{
+  "name": "mimicry-economic-modelling",
+  "version": "1.0.0",
+  "description": "A Monte Carlo experiment to help determine the most optimal economic constants for the Mimicry Protocol.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mimicry-Protocol/economic-modelling.git"
+  },
+  "author": "Aslan Goldenhour",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Mimicry-Protocol/economic-modelling/issues"
+  },
+  "homepage": "https://github.com/Mimicry-Protocol/economic-modelling#readme",
+  "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
+    "@types/random-name": "^0.1.0",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "chart.js": "^4.2.1",
+    "lodash": "^4.17.21",
+    "random-name": "^0.1.2"
+  }
+}
