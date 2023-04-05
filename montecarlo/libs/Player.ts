@@ -1,4 +1,5 @@
 import { Position } from "./Position";
+import { Skew } from "./Market";
 import * as namer from "random-name";
 // TODO: Upgrade namer to @faker-js/faker
 
@@ -28,6 +29,10 @@ export class Player {
     // This is called from the position constructor
     addPosition(position: Position) {
         this.positions.push(position);
+    }
+
+    get skew(): Skew {
+        return { long: this.totalLong, short: this.totalShort };
     }
 
     get feesEarned():number {
@@ -62,6 +67,10 @@ export class Player {
         return this.positions.reduce((acc, position) => acc + position.realizedProfit, 0);
     }
 
+    get netProfit():number {
+        return this.realizedProfit + this.unrealizedProfit;
+    }
+
     get feesPaid():number {
         return this.positions.reduce((acc, position) => acc + position.amountFeesPaid, 0);
     }
@@ -72,9 +81,6 @@ export class Player {
 
     
 
-    get netProfit():number {
-        return this.realizedProfit + this.unrealizedProfit;
-    }
 
     get netLoss():number {
         return this.feesPaid + this.feesOwed;

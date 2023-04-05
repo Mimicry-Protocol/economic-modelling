@@ -8,11 +8,11 @@ import {
 } from "./montecarlo/libs/Constants";
 
 const doodles = new Market("Doodles");
-const players = 50;
-const iterations = 1000;
+const players = 5;
+const iterations = 100;
 
 for (let i = 0; i < players; i++) {
-    const player = new Player("Player " + i, Budget.low);
+    const player = new Player();
     
     if (oddsNewPositionIsLp > Math.random()) {
         doodles.openPosition(player, Direction.long);
@@ -38,6 +38,12 @@ for (let i = 0; i < players; i++) {
     }
 }
 
-for (const player of doodles.players) {
-    console.log(player.feesEarned);
+for (const position of doodles.positions) {
+    position.close();
 }
+
+for (const player of doodles.players) {
+    console.log(player.name + " " + player.budget + " " + player.netProfit);
+}
+
+console.log(doodles.feesEarned);

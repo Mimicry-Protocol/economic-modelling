@@ -20,7 +20,6 @@ export class Market {
     positions: Position[]   = [];
     players: Player[]       = [];
     skew: Skew              = { long: 0, short: 0 };
-    feesCaptured: number    = 0;
     block: number           = 0;   // Represents the current block number for tracking time
 
     constructor(
@@ -99,7 +98,6 @@ export class Market {
     }
 
     captureAndDistributeFees(fee: number) {
-        this.feesCaptured += fee;
         this.director.captureFees(fee * percentageOfMarketFeesToDirector);
         this.payFeesToLps(fee * (1 - percentageOfMarketFeesToDirector));
     }
