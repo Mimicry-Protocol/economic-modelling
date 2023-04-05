@@ -1,6 +1,7 @@
 import {
     exitFeeTraders,
     exitFeeLPs,
+    longShortDistanceThresholdForLp,
 } from './Constants';
 import {  
     Player 
@@ -18,11 +19,12 @@ export class Position {
     market: Market;
     player: Player;
     direction: Direction;
-    amountDeposited: number;
     token: Token;
-    amountWithdrawn: number;
-    feesEarned: number;
-    feesPaid: number;
+    amountDeposited: number     = 0;
+    amountWithdrawn: number     = 0;
+    amountFeesPaid: number      = 0;
+    amountFeesEarned: number    = 0;
+    multiplier: number          = 1;
 
     constructor(
         _market: Market,
@@ -39,37 +41,45 @@ export class Position {
         this.player.addPosition(this);
         this.market.addPosition(this);
         this.market.addPlayer(this.player);
-        //
-        this.amountDeposited = 0;
-        this.amountWithdrawn = 0;
-        this.feesEarned = 0;
-        this.feesPaid = 0;
 
         this.deposit(_amount);
     }
 
     deposit(amount: number) {
+        this.player.budget -= amount;
         this.amountDeposited += amount;
-
-        if (this.direction === Direction.long) {
-            this.market.increaseLongs(amount);
-        } else {
-            this.market.increaseShorts(amount);
-        }
-
-        this.market.valueTranferEvent(0);
+        this.market.increaseSkew(this.direction, amount);
     }
 
     withdraw(amount: number) {
-        const feesToPay = amount * this.exitFeeRatio;
-        this.feesPaid += feesToPay;
-        this.amountWithdrawn += amount - feesToPay;
+        // Calculate and pay the exit fee
+        const exitFee = amount * this.exitFeeRatio;
+        this.amountFeesPaid += exitFee;
 
-        this.market.valueTranferEvent(0);
+        // Decrease the skew and multiplier
+        this.multiplier -= this.multiplier * (amount / this.value);
+        this.market.decreaseSkew(this.direction, amount);
+        this.market.captureAndDistributeFees(exitFee);
+
+        // Update the amount withdrawn
+        const amountToWithdraw = amount - exitFee;
+        this.player.budget += amountToWithdraw;
+        this.amountWithdrawn += amountToWithdraw;
     }
 
-    get positionValueBeforeFees():number {
-        return this.amountDeposited - this.amountWithdrawn;
+    captureFees(amount: number) {
+        this.amountFeesEarned += amount;
+    }
+
+    close() {
+        this.withdraw(this.value);
+        this.multiplier = 0;
+    }
+
+    get value():number {
+        const amount = (this.multiplier / this.market.multipliers[this.direction]) * this.market.skew[this.direction]
+        // If amount is NaN, then return 0, otherwise return amount
+        return (amount === amount) ? amount : 0;
     }
 
     get earnsFees():boolean {
@@ -78,43 +88,36 @@ export class Position {
         const totalLong = positions.reduce((acc, position) => acc + position.long, 0);
         const totalShort = positions.reduce((acc, position) => acc + position.short, 0);
 
-        // If each side is within 90% of each other, then return true
+        // If each side is within a certain percentage of each other, then return true
         const percentageDifference = Math.abs(totalLong - totalShort) / Math.max(totalLong, totalShort) * 100;
-        return percentageDifference <= 90;
+        return percentageDifference <= (longShortDistanceThresholdForLp * 100);
     }
 
     get long():number {
-        return (this.direction === Direction.long) ? this.positionValueBeforeFees : 0;
+        return (this.direction === Direction.long) ? this.value : 0;
     }
 
     get short():number {
-        return (this.direction === Direction.short) ? this.positionValueBeforeFees : 0;
+        return (this.direction === Direction.short) ? this.value : 0;
     }
 
     get exitFeeRatio():number {
         return (this.earnsFees) ? exitFeeLPs : exitFeeTraders;
     }
 
-    
-
-
-
-
-
     get feesOwed():number {
-        return (this.amountDeposited - this.amountWithdrawn - this.feesPaid) * this.exitFeeRatio;
+        return this.value * this.exitFeeRatio;
     }
 
     get unrealizedProfit():number {
-        return this.liquidationValue - this.amountDeposited + this.amountWithdrawn;
+        return (this.multiplier === 0) ? 0 : this.value - this.amountDeposited + this.amountWithdrawn - this.feesOwed;
     }
 
     get realizedProfit():number {
-        // TODO: Implement this
-        return 0;
+        return (this.multiplier > 0) ? 0 : this.amountWithdrawn - this.amountDeposited;
     }
 
     get liquidationValue():number {
-        return this.amountDeposited - this.amountWithdrawn - this.feesPaid - this.feesOwed;
+        return this.value - this.feesOwed;
     }
 }

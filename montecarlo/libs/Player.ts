@@ -30,6 +30,10 @@ export class Player {
         this.positions.push(position);
     }
 
+    get feesEarned():number {
+        return this.positions.reduce((acc, position) => acc + position.amountFeesEarned, 0);
+    }
+
     get totalLong():number {
         return this.positions.reduce((acc, position) => acc + position.long, 0);
     }
@@ -59,16 +63,14 @@ export class Player {
     }
 
     get feesPaid():number {
-        return this.positions.reduce((acc, position) => acc + position.feesPaid, 0);
+        return this.positions.reduce((acc, position) => acc + position.amountFeesPaid, 0);
     }
 
     get feesOwed():number {
         return this.positions.reduce((acc, position) => acc + position.feesOwed, 0);
     }
 
-    get feesEarned():number {
-        return this.positions.reduce((acc, position) => acc + position.feesEarned, 0);
-    }
+    
 
     get netProfit():number {
         return this.realizedProfit + this.unrealizedProfit;

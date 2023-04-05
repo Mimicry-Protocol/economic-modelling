@@ -5,6 +5,7 @@ import { Oracle } from './Oracle';
 import { Direction, Position } from './Position';
 import { Player } from './Player';
 import { Director } from './Director';
+import { percentageOfMarketFeesToDirector } from './Constants';
 
 export interface Skew {
     long: number;
@@ -16,10 +17,11 @@ export class Market {
     director: Director;
     lastReferencePrice: number;
     oracle: Oracle;
-    positions: Position[];
-    players: Player[];
-    skew: Skew;
-    block: number = 0; // Represents the current block number for tracking time
+    positions: Position[]   = [];
+    players: Player[]       = [];
+    skew: Skew              = { long: 0, short: 0 };
+    feesCaptured: number    = 0;
+    block: number           = 0;   // Represents the current block number for tracking time
 
     constructor(
         _name: string = namer.place(),
@@ -27,11 +29,7 @@ export class Market {
     ) {
         this.name = _name;
         this.oracle = new Oracle();
-        this.positions = [];
-        this.players = [];
-        this.skew = {long: 0, short: 0};
         this.lastReferencePrice = this.referencePrice;
-
         this.replaceDirector(_director);
     }
 
@@ -67,12 +65,16 @@ export class Market {
         }
     }
 
-    increaseLongs(amount: number) {
-        this.skew.long += amount;
+    // This is called from position.deposit
+    increaseSkew(direction:Direction, amount: number) {
+        this.skew[direction] += amount;
+        this.valueTranferEvent(0);
     }
 
-    increaseShorts(amount: number) {
-        this.skew.short += amount;
+    // This is called from position.withdraw
+    decreaseSkew(direction:Direction, amount: number) {
+        this.skew[direction] -= amount;
+        this.valueTranferEvent(0);
     }
 
     valueTranferEvent(
@@ -95,7 +97,48 @@ export class Market {
         // Increment the blockTime for tracking purposes
         this.block++;
     }
- 
+
+    captureAndDistributeFees(fee: number) {
+        this.feesCaptured += fee;
+        this.director.captureFees(fee * percentageOfMarketFeesToDirector);
+        this.payFeesToLps(fee * (1 - percentageOfMarketFeesToDirector));
+    }
+
+    payFeesToLps(fee: number) {
+        // Get a list of positions that earn fees
+        const positions = _.filter(this.positions, (position:Position) => {
+            return position.earnsFees === true && position.value > 0;
+        });
+        // Then pay the fees to the LPs, proportionally to their position size
+        const totalAmount = _.sumBy(positions, (position:Position) => {
+            return position.value;
+        });
+        _.forEach(positions, (position:Position) => {
+            const amount = position.value;
+            const percentage = amount / totalAmount;
+            const amountFeesPaid = fee * percentage;
+            position.captureFees(amountFeesPaid);
+        });
+    }
+
+    get multipliers():Skew {
+        // get the multiplier for each direction from the positions in the market
+        const longMultiplier = _.sumBy(this.positions, (position:Position) => {
+            return (position.direction === Direction.long) ? position.multiplier : 0;
+        });
+        const shortMultiplier = _.sumBy(this.positions, (position:Position) => {
+            return (position.direction === Direction.short) ? position.multiplier : 0;
+        });
+        return {long: longMultiplier, short: shortMultiplier};
+    }
+
+    get feesEarned():number {
+        // Fees paid by all positions
+        return _.sumBy(this.positions, (position:Position) => {
+            return position.amountFeesPaid;
+        });
+    }
+
     get referencePrice():number {
         return this.oracle.referencePrice;
     }

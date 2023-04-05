@@ -1,8 +1,10 @@
 import { expect } from 'chai';
-import { Market } from '../libs/Market';
+import { Market, Skew } from '../libs/Market';
 import { Director } from '../libs/Director';
 import { Player } from '../libs/Player';
 import { Direction } from '../libs/Position';
+import { exitFeeTraders, exitFeeLPs, percentageOfMarketFeesToDirector } from '../libs/Constants';
+
 
 describe("Markets", () => {
     it("should have the ability to replace a director", () => {
@@ -67,6 +69,48 @@ describe("Markets", () => {
         market.valueTranferEvent(-1);
         expect(market.skew.long).to.equal(0);
         expect(market.skew.short).to.equal(200);
+    });
+    it("should be able to track position values properly after value transfer and withdraw", () => {
+        const market = new Market();
+        const player1 = new Player();
+        const player2 = new Player();
+        const position1 = market.openPosition(player1, Direction.long, 100);
+        const position2 = market.openPosition(player2, Direction.short, 100);
+        market.valueTranferEvent(.1);
+        expect(position1.value).to.equal(110);
+        expect(position2.value).to.equal(90);
+        const skew1: Skew = {long: 1, short: 1};
+        expect(market.multipliers.long).to.equal(1);
+        expect(market.multipliers.short).to.equal(1);
+        position1.withdraw(100);
+        expect(position1.value).to.equal(10);
+        expect(position2.value).to.equal(90);
+        expect(market.multipliers.long).to.equal(0.09090909090909094);
+        expect(market.multipliers.short).to.equal(1);
+    });
+    it("should take exit fees properly depending on trader or LP", () => {
+        const market = new Market();
+        const player1 = new Player();
+        const player2 = new Player();
+        const position1 = market.openPosition(player1, Direction.long, 1000);
+        const position2 = market.openPosition(player1, Direction.short, 1000);
+        const position3 = market.openPosition(player2, Direction.short, 1000);
+        expect(position1.earnsFees).to.equal(true);
+        expect(position2.earnsFees).to.equal(true);
+        expect(position3.earnsFees).to.equal(false);
+        position1.withdraw(100);
+        position3.withdraw(100);
+        expect(position1.value).to.equal(900);
+        expect(position3.value).to.equal(900);
+        expect(position1.amountFeesPaid).to.equal(100 * exitFeeLPs);
+        expect(position3.amountFeesPaid).to.equal(100 * exitFeeTraders);
+        expect(position1.amountWithdrawn).to.equal(100 - (100 * exitFeeLPs));
+        expect(position3.amountWithdrawn).to.equal(100 - (100 * exitFeeTraders));
+        expect(market.feesEarned).to.equal(position1.amountFeesPaid + position3.amountFeesPaid);
+        const feesPaidToLps = (1 - percentageOfMarketFeesToDirector) * (position1.amountFeesPaid + position3.amountFeesPaid);
+        expect(player1.feesEarned).to.approximately(feesPaidToLps, 0.00000001);
+        expect(player2.feesEarned).to.equal(0);
+        expect(market.director.feesEarned).to.approximately(percentageOfMarketFeesToDirector * (position1.amountFeesPaid + position3.amountFeesPaid), 0.00000001);
     });
 
 });

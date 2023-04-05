@@ -5,6 +5,9 @@ A Monte Carlo experiment to help determine the most optimal economic constants f
 Run **```npm install```** from the root directory.
 
 ## To Test
+Run **```npm test```** from the root directory.
+
+## To Run the Console Logger
 Run **```ts-node index.ts```** from the root directory.
 
 ## To Run the Visualizer
