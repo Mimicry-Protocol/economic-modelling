@@ -24,7 +24,7 @@ export class Position {
     amountWithdrawn: number     = 0;
     amountFeesPaid: number      = 0;
     amountFeesEarned: number    = 0;
-    multiplier: number          = 1;
+    multiplier: number          = 0;
 
     constructor(
         _market: Market,
@@ -45,19 +45,32 @@ export class Position {
         this.deposit(_amount);
     }
 
+    updateMultiplier(amount: number) {
+        if (this.market.multipliers[this.direction] !== 0) {
+            this.multiplier += (this.market.multipliers[this.direction]
+                               / this.market.skew[this.direction])
+                               * amount;
+        } else {
+            this.multiplier = 1;
+        }
+    }
+
     deposit(amount: number) {
+        this.updateMultiplier(amount);
         this.player.budget -= amount;
         this.amountDeposited += amount;
         this.market.increaseSkew(this.direction, amount);
     }
 
     withdraw(amount: number) {
+        // Modify our multiplier
+        this.updateMultiplier(-amount);
+
         // Calculate and pay the exit fee
         const exitFee = amount * this.exitFeeRatio;
         this.amountFeesPaid += exitFee;
 
         // Decrease the skew and multiplier
-        this.multiplier -= this.multiplier * (amount / this.value);
         this.market.decreaseSkew(this.direction, amount);
         this.market.captureAndDistributeFees(exitFee);
 

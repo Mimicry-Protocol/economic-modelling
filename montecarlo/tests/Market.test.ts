@@ -80,13 +80,27 @@ describe("Markets", () => {
         expect(position1.value).to.equal(110);
         expect(position2.value).to.equal(90);
         const skew1: Skew = {long: 1, short: 1};
-        expect(market.multipliers.long).to.equal(1);
-        expect(market.multipliers.short).to.equal(1);
+        expect(market.multipliers.long).to.equal(market.multipliers.short);
         position1.withdraw(100);
         expect(position1.value).to.equal(10);
         expect(position2.value).to.equal(90);
-        expect(market.multipliers.long).to.equal(0.09090909090909094);
+        expect(market.multipliers.long).to.approximately(10/110, .0001);
         expect(market.multipliers.short).to.equal(1);
+    });
+    it("should have variable multipliers depending on the order of positions opened", () => {
+        const market = new Market();
+        const Alice = new Player();
+        const Bob = new Player();
+        const Charlie = new Player();
+        const position1 = market.openPosition(Alice, Direction.long, 1000);
+        const position2 = market.openPosition(Bob, Direction.long, 500);
+        const position3 = market.openPosition(Charlie, Direction.short, 200);
+        expect(position1.multiplier).to.equal(position2.multiplier * 2);
+        position1.withdraw(400);
+        expect(position1.value).to.approximately(600, .0001);
+        position2.deposit(250);
+        expect(position2.value).to.approximately(750, .0001);
+        expect(position3.value).to.equal(200);
     });
     it("should take exit fees properly depending on trader or LP", () => {
         const market = new Market();
