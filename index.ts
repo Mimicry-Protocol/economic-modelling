@@ -38,12 +38,10 @@ for (let i = 0; i < players; i++) {
     }
 }
 
-for (const position of doodles.positions) {
-    position.close();
-}
-
+doodles.closePositions();
 for (const player of doodles.players) {
     console.log(player.name + " " + player.budget + " " + player.netProfit);
 }
-
 console.log(doodles.feesEarned);
+
+// @TODO: Send results to charting library

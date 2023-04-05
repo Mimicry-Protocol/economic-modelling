@@ -119,6 +119,12 @@ export class Market {
         });
     }
 
+    closePositions() {
+        _.forEach(this.positions, (position:Position) => {
+            position.close();
+        });
+    }
+
     get multipliers():Skew {
         // get the multiplier for each direction from the positions in the market
         const longMultiplier = _.sumBy(this.positions, (position:Position) => {
